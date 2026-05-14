@@ -1,34 +1,34 @@
 from fastapi import APIRouter, Header, Depends, HTTPException
 from sqlmodel import Session, select
+from app.db.database import get_session
+from app.models.user import User
+from app.auth.jwt_handler import verify_token
 
-from db.database import get_session
-from auth.auth import verify_token
-from models.user import User
-
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/auth/login")
-def login(authorization: str = Header(None), session: Session = Depends(get_session)):
+@router.post("/login")
+def google_auth(authorization: str = Header(), session: Session = Depends(get_session)):
 
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing token")
+    try:
+        token = authorization.split(" ")[1]
 
-    token = authorization.split(" ")[1]
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid authorization header")
 
     payload = verify_token(token)
-
     email = payload["email"]
-
+    name = payload.get("user_metadata", {}).get("full_name", "User")
     user = session.exec(select(User).where(User.email == email)).first()
 
     if not user:
-        user = User(
-            name=payload.get("user_metadata", {}).get("full_name", "User"), email=email
-        )
+        user = User(name=name, email=email)
 
         session.add(user)
         session.commit()
         session.refresh(user)
 
-    return {"id": str(user.id), "name": user.name, "email": user.email}
+    return {
+        "message": "Authentication successful",
+        "user": {"id": str(user.id), "name": user.name, "email": user.email},
+    }
