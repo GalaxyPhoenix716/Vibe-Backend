@@ -1,1 +1,8 @@
 .env
+
+#Pycache
+app/__pychace__
+app/auth/__pychace__
+app/core/__pychace__
+app/db/__pychace__
+app/model/__pychace__
