@@ -1,13 +1,21 @@
-from pydantic import BaseModel
-from sqlmodel import TEXT, VARCHAR, Column
+from sqlmodel import SQLModel, Field
+from uuid import uuid4
+from datetime import datetime, UTC
 
+class Song(SQLModel, table=True):
 
-class Song(BaseModel):
     __tablename__ = "songs"
 
-    id = Column(TEXT, primary_key=True)
-    song_url = Column(TEXT)
-    thumbnail_url = Column(TEXT)
-    artist = Column(TEXT)
-    song_name = Column(VARCHAR(100))
-    hex_code = Column(VARCHAR(6))
+    id: str = Field(
+        default_factory=lambda: str(uuid4()),
+        primary_key=True,
+        index=True,
+    )
+
+    song_name: str
+
+    artist: str
+
+    song_url: str
+
+    thumbnail_url: str

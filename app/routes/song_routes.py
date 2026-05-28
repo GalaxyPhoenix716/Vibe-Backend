@@ -48,4 +48,13 @@ def upload_song(
     db.commit()
     db.refresh(new_song)
 
-    return new_song
+    return {
+    "message": "Song uploaded successfully",
+    "song": {
+        "id": new_song.id,
+        "song_name": new_song.song_name,
+        "artist": new_song.artist,
+        "song_url": new_song.song_url,
+        "thumbnail_url": new_song.thumbnail_url,
+    }
+}
