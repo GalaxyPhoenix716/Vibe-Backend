@@ -1,5 +1,4 @@
 import uuid
-
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlmodel import Session
 from app.db.database import get_session
@@ -26,7 +25,6 @@ def upload_song(
     thumbnail: UploadFile = File(...),
     artist: str = Form(...),
     song_name: str = Form(...),
-    hex_code: str = Form(...),
     db: Session = Depends(get_session),
     auth_user: dict = Depends(get_current_user),
 ):
@@ -42,7 +40,6 @@ def upload_song(
         id=song_id,
         song_name=song_name,
         artist=artist,
-        hex_code=hex_code,
         song_url=song_upload_response["url"],
         thumbnail_url=thumbnail_upload_response["url"],
     )
