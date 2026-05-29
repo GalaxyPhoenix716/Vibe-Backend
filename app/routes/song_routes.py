@@ -49,12 +49,19 @@ def upload_song(
     db.refresh(new_song)
 
     return {
-    "message": "Song uploaded successfully",
-    "song": {
-        "id": new_song.id,
-        "song_name": new_song.song_name,
-        "artist": new_song.artist,
-        "song_url": new_song.song_url,
-        "thumbnail_url": new_song.thumbnail_url,
+        "message": "Song uploaded successfully",
+        "song": {
+            "id": new_song.id,
+            "song_name": new_song.song_name,
+            "artist": new_song.artist,
+            "song_url": new_song.song_url,
+            "thumbnail_url": new_song.thumbnail_url,
+        },
     }
-}
+
+
+@router.get("/list", status_code=200)
+def fetchSongs(
+    db: Session = Depends(get_session), auth_details=Depends(get_current_user )
+):
+    pass
