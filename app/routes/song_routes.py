@@ -1,6 +1,6 @@
 import uuid
 from fastapi import APIRouter, Depends, File, Form, UploadFile
-from sqlmodel import Session
+from sqlmodel import Session, select
 from app.db.database import get_session
 import cloudinary
 import cloudinary.uploader
@@ -62,6 +62,7 @@ def upload_song(
 
 @router.get("/list", status_code=200)
 def fetchSongs(
-    db: Session = Depends(get_session), auth_details=Depends(get_current_user )
+    db: Session = Depends(get_session)
 ):
-    pass
+    songs = db.query(Song).all()
+    return songs
