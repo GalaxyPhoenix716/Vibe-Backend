@@ -25,6 +25,7 @@ def upload_song(
     thumbnail: UploadFile = File(...),
     artist: str = Form(...),
     song_name: str = Form(...),
+    tags: str = Form(...),
     db: Session = Depends(get_session),
     auth_user: dict = Depends(get_current_user),
 ):
@@ -40,6 +41,7 @@ def upload_song(
         id=song_id,
         song_name=song_name,
         artist=artist,
+        tags=tags,
         song_url=song_upload_response["url"],
         thumbnail_url=thumbnail_upload_response["url"],
     )
@@ -56,13 +58,12 @@ def upload_song(
             "artist": new_song.artist,
             "song_url": new_song.song_url,
             "thumbnail_url": new_song.thumbnail_url,
+            "tags": new_song.tags,
         },
     }
 
 
 @router.get("/list", status_code=200)
-def fetchSongs(
-    db: Session = Depends(get_session)
-):
+def fetchSongs(db: Session = Depends(get_session)):
     songs = db.query(Song).all()
     return songs
