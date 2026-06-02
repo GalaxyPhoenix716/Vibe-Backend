@@ -20,4 +20,4 @@ class Song(SQLModel, table=True):
 
     thumbnail_url: str
     
-    tags: list[str]
+    tags: str
