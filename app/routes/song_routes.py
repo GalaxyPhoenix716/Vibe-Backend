@@ -7,6 +7,8 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from app.core.config import settings
 from app.middleware.auth_middleware import get_current_user
+from app.models.favourite import Favourites
+from app.schemas.favourite import FavouriteSong
 from app.models.song import Song
 
 router = APIRouter(prefix="/song", tags=["Upload Song"])
@@ -64,6 +66,32 @@ def upload_song(
 
 
 @router.get("/list", status_code=200)
-def fetchSongs(db: Session = Depends(get_session)):
+def fetchSongs(
+    db: Session = Depends(get_session), auth_details=Depends(get_current_user)
+):
     songs = db.query(Song).all()
     return songs
+
+
+@router.post("/favourite", status_code=201)
+def favouriteSong(
+    fav_song: FavouriteSong,
+    db: Session = Depends(get_session),
+    auth_details=Depends(get_current_user),
+):
+    user_id = auth_details["id"]
+
+    fav_song_res = db.query(Favourites).filter(
+        Favourites.song_id == fav_song.song_id, Favourites.user_id == user_id
+    )
+
+    if fav_song_res:
+        db.delete(fav_song_res)
+        db.commit()
+
+        return {"message": False}
+    else:
+        new_fav = Favourites(id=str(uuid.uuid4()), song_id=fav_song.id, user_id=user_id)
+        db.add(new_fav)
+        db.commit()
+        return {"message": True}
