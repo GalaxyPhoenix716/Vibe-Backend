@@ -1,6 +1,7 @@
 import uuid
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlmodel import Session, select
+from sqlalchemy.orm import joinedload
 from app.db.database import get_session
 import cloudinary
 import cloudinary.uploader
@@ -104,5 +105,10 @@ def fetchFavSongs(
     db: Session = Depends(get_session), auth_details=Depends(get_current_user)
 ):
     user_id = auth_details["id"]
-    fav_songs = db.query(Favourites).filter(Favourites.user_id == user_id).all()
+    fav_songs = (
+        db.query(Favourites)
+        .filter(Favourites.user_id == user_id)
+        .options(joinedload(Favourites.song))
+        .all()
+    )
     return fav_songs
