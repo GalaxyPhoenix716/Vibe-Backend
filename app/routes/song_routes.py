@@ -81,8 +81,10 @@ def favouriteSong(
 ):
     user_id = auth_details["id"]
 
-    fav_song_res = db.query(Favourites).filter(
-        Favourites.song_id == fav_song.song_id, Favourites.user_id == user_id
+    fav_song_res = (
+        db.query(Favourites)
+        .filter(Favourites.song_id == fav_song.song_id, Favourites.user_id == user_id)
+        .first()
     )
 
     if fav_song_res:
@@ -95,3 +97,12 @@ def favouriteSong(
         db.add(new_fav)
         db.commit()
         return {"message": True}
+
+
+@router.get("/list-favourites", status_code=200)
+def fetchFavSongs(
+    db: Session = Depends(get_session), auth_details=Depends(get_current_user)
+):
+    user_id = auth_details["id"]
+    fav_songs = db.query(Favourites).filter(Favourites.user_id == user_id).all()
+    return fav_songs
