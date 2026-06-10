@@ -15,9 +15,9 @@ from app.models.song import Song
 router = APIRouter(prefix="/song", tags=["Upload Song"])
 
 cloudinary.config(
-    cloud_name="dkhsttchv",
-    api_key="246684925226145",
-    api_secret=settings.CLOUDINARY_API_KEY,
+    cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+    api_key=settings.CLOUDINARY_API_KEY,
+    api_secret=settings.CLOUDINARY_API_SECRET,
     secure=True,
 )
 
