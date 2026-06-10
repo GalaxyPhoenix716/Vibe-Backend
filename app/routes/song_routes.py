@@ -1,7 +1,7 @@
 import uuid
 from typing import List
-from fastapi import APIRouter, Depends, File, Form, UploadFile
-from sqlmodel import Session, select
+from fastapi import APIRouter, Depends, File, Form, UploadFile, Query
+from sqlmodel import Session, select, or_
 from sqlalchemy.orm import joinedload
 from app.db.database import get_session
 import cloudinary
@@ -76,6 +76,26 @@ def fetchSongs(
 ):
     songs = db.exec(select(Song)).all()
     return songs
+
+
+@router.get("/search", response_model=List[SongResponse])
+def search_songs(
+    q: str = Query(..., min_length=1),
+    db: Session = Depends(get_session),
+    auth_details: User = Depends(get_current_user),
+):
+    """
+    Search for songs by matching title, artist, or tags case-insensitively.
+    """
+    statement = select(Song).where(
+        or_(
+            Song.song_name.ilike(f"%{q}%"),
+            Song.artist.ilike(f"%{q}%"),
+            Song.tags.ilike(f"%{q}%"),
+        )
+    )
+    results = db.exec(statement).all()
+    return results
 
 
 @router.post("/favourite", status_code=201, response_model=FavouriteToggleResponse)
