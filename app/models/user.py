@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field
-from sqlalchemy.orm import relationship
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List
 from uuid import UUID, uuid4
 from datetime import datetime, UTC
+
 class User(SQLModel, table=True):
     __tablename__ = "users"
 
@@ -14,5 +15,5 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    
-    favourites = relationship('Favourites', back_populates='user')
+
+    favourites: List["Favourites"] = Relationship(back_populates="user")

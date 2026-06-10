@@ -1,6 +1,5 @@
-from pydantic import Field
-from sqlmodel import ForeignKey, SQLModel
-from sqlalchemy.orm import relationship
+from sqlmodel import SQLModel, Field, Relationship
+from uuid import UUID
 
 
 class Favourites(SQLModel, table=True):
@@ -8,9 +7,9 @@ class Favourites(SQLModel, table=True):
 
     id: str = Field(primary_key=True, index=True)
 
-    song_id: str = Field(ForeignKey("songs.id"))
+    song_id: str = Field(foreign_key="songs.id")
 
-    user_id: str = Field(ForeignKey("users.id"))
+    user_id: UUID = Field(foreign_key="users.id")
 
-    song = relationship("Song")
-    user = relationship("Users", back_populates="favourites")
+    song: "Song" = Relationship()
+    user: "User" = Relationship(back_populates="favourites")

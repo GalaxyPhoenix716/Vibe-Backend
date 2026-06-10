@@ -94,7 +94,7 @@ def favouriteSong(
 
         return {"message": False}
     else:
-        new_fav = Favourites(id=str(uuid.uuid4()), song_id=fav_song.id, user_id=user_id)
+        new_fav = Favourites(id=str(uuid.uuid4()), song_id=fav_song.song_id, user_id=user_id)
         db.add(new_fav)
         db.commit()
         return {"message": True}
