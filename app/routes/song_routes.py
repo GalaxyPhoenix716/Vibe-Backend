@@ -8,7 +8,7 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from app.core.config import settings
 from app.middleware.auth_middleware import get_current_user
-from app.models.favourite import Favourites
+from app.models.favourite import Favourite
 from app.schemas.favourite import FavouriteSong
 from app.models.song import Song
 
@@ -83,8 +83,8 @@ def favouriteSong(
     user_id = auth_details["id"]
 
     fav_song_res = db.exec(
-        select(Favourites).where(
-            Favourites.song_id == fav_song.song_id, Favourites.user_id == user_id
+        select(Favourite).where(
+            Favourite.song_id == fav_song.song_id, Favourite.user_id == user_id
         )
     ).first()
 
@@ -94,7 +94,7 @@ def favouriteSong(
 
         return {"message": False}
     else:
-        new_fav = Favourites(id=str(uuid.uuid4()), song_id=fav_song.song_id, user_id=user_id)
+        new_fav = Favourite(id=str(uuid.uuid4()), song_id=fav_song.song_id, user_id=user_id)
         db.add(new_fav)
         db.commit()
         return {"message": True}
@@ -106,8 +106,8 @@ def fetchFavSongs(
 ):
     user_id = auth_details["id"]
     fav_songs = db.exec(
-        select(Favourites)
-        .where(Favourites.user_id == user_id)
-        .options(joinedload(Favourites.song))
+        select(Favourite)
+        .where(Favourite.user_id == user_id)
+        .options(joinedload(Favourite.song))
     ).all()
     return fav_songs
