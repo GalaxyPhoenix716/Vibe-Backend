@@ -24,8 +24,12 @@ def google_auth(authorization: str = Header(), session: Session = Depends(get_se
     user = session.exec(select(User).where(User.email == email)).first()
 
     if not user:
-        user = User(name=name, email=email)
-
+        user = User(id=payload["sub"], name=name, email=email)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+    elif str(user.id) != payload["sub"]:
+        user.id = payload["sub"]
         session.add(user)
         session.commit()
         session.refresh(user)
@@ -40,12 +44,11 @@ def google_auth(authorization: str = Header(), session: Session = Depends(get_se
 def current_user_data(
     db: Session = Depends(get_session), user_dict=Depends(get_current_user)
 ):
-    user = (
-        db.query(User)
-        .filter(User.id == user_dict["id"])
+    user = db.exec(
+        select(User)
+        .where(User.id == user_dict["id"])
         .options(joinedload(User.favourites))
-        .first()
-    )
+    ).first()
 
     if not user:
         raise HTTPException(404, "User not found!")

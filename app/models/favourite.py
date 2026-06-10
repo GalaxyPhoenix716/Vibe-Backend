@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID
+from app.models.song import Song
 
 
 class Favourites(SQLModel, table=True):
