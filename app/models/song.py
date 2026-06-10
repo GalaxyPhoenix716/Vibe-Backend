@@ -1,6 +1,8 @@
-from sqlmodel import SQLModel, Field
+from typing import List
+from sqlmodel import SQLModel, Field, Relationship
 from uuid import uuid4
 from datetime import datetime, UTC
+from app.models.playlist import Playlist, PlaylistSongLink
 
 class Song(SQLModel, table=True):
 
@@ -21,3 +23,8 @@ class Song(SQLModel, table=True):
     thumbnail_url: str
     
     tags: str
+
+    playlists: List[Playlist] = Relationship(
+        back_populates="songs",
+        link_model=PlaylistSongLink
+    )
