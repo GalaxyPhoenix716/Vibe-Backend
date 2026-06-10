@@ -10,22 +10,22 @@ To keep things efficient, the server uploads and hosts media assets (audio files
 
 Here is what I am using to build the backend:
 
-* **FastAPI**: The web framework for handling API routes and requests.
-* **SQLModel**: The database toolkit that combines SQLAlchemy and Pydantic so I can write pythonic database models.
-* **PostgreSQL**: The relational database for storing app data.
-* **PyJWT & PyJWKClient**: To fetch Supabase's public signature keys and verify user logins.
-* **Cloudinary**: For storing and serving audio files and song covers.
-* **Pydantic Settings**: For loading configuration settings from environment files.
+- **FastAPI**: The web framework for handling API routes and requests.
+- **SQLModel**: The database toolkit that combines SQLAlchemy and Pydantic so I can write pythonic database models.
+- **PostgreSQL**: The relational database for storing app data.
+- **PyJWT & PyJWKClient**: To fetch Supabase's public signature keys and verify user logins.
+- **Cloudinary**: For storing and serving audio files and song covers.
+- **Pydantic Settings**: For loading configuration settings from environment files.
 
 ---
 
 ## Core Features
 
-* **Secure Authentication**: Validates user JWT tokens against Supabase using FastAPI's HTTPBearer middleware.
-* **Database Unique Constraints**: Added unique constraints at the database level to prevent duplicate favorites and duplicate songs in the same playlist.
-* **Optimized Queries**: Uses SQLAlchemy joinedload options to eagerly load database relations and prevent slow N+1 query execution.
-* **Type-Safe Serialization**: Implements custom Pydantic response models to make sure the server returns consistent JSON payloads to the Flutter client.
-* **Real-time search**: Offers case-insensitive search filtering across song titles, artists, and tag lists.
+- **Secure Authentication**: Validates user JWT tokens against Supabase using FastAPI's HTTPBearer middleware.
+- **Database Unique Constraints**: Added unique constraints at the database level to prevent duplicate favorites and duplicate songs in the same playlist.
+- **Optimized Queries**: Uses SQLAlchemy joinedload options to eagerly load database relations and prevent slow N+1 query execution.
+- **Type-Safe Serialization**: Implements custom Pydantic response models to make sure the server returns consistent JSON payloads to the Flutter client.
+- **Real-time search**: Offers case-insensitive search filtering across song titles, artists, and tag lists.
 
 ---
 
@@ -70,31 +70,31 @@ server/
 
 ### Auth Endpoints
 
-| Method | Endpoint | Requires Token? | Description |
-| :--- | :--- | :---: | :--- |
-| `POST` | `/auth/login` | Yes | Signs in a user and logs them in our local database. |
-| `GET` | `/auth/` | Yes | Returns the logged-in user profile with their favorite songs. |
+| Method | Endpoint      | Requires Token? | Description                                                   |
+| :----- | :------------ | :-------------: | :------------------------------------------------------------ |
+| `POST` | `/auth/login` |       Yes       | Signs in a user and logs them in our local database.          |
+| `GET`  | `/auth/`      |       Yes       | Returns the logged-in user profile with their favorite songs. |
 
 ### Song Endpoints
 
-| Method | Endpoint | Requires Token? | Description |
-| :--- | :--- | :---: | :--- |
-| `POST` | `/song/upload` | Yes | Uploads a song audio and thumbnail to Cloudinary and saves metadata. |
-| `GET` | `/song/list` | Yes | Lists all available songs. |
-| `GET` | `/song/search` | Yes | Searches the library case-insensitively by title, artist, or tags. |
-| `POST` | `/song/favourite` | Yes | Toggles a song as a user favorite. |
-| `GET` | `/song/list-favourites` | Yes | Returns all the user's favorite songs. |
+| Method | Endpoint                | Requires Token? | Description                                                          |
+| :----- | :---------------------- | :-------------: | :------------------------------------------------------------------- |
+| `POST` | `/song/upload`          |       Yes       | Uploads a song audio and thumbnail to Cloudinary and saves metadata. |
+| `GET`  | `/song/list`            |       Yes       | Lists all available songs.                                           |
+| `GET`  | `/song/search`          |       Yes       | Searches the library case-insensitively by title, artist, or tags.   |
+| `POST` | `/song/favourite`       |       Yes       | Toggles a song as a user favorite.                                   |
+| `GET`  | `/song/list-favourites` |       Yes       | Returns all the user's favorite songs.                               |
 
 ### Playlist Endpoints
 
-| Method | Endpoint | Requires Token? | Description |
-| :--- | :--- | :---: | :--- |
-| `POST` | `/playlist/create` | Yes | Creates a new playlist. |
-| `GET` | `/playlist/list` | Yes | Lists all playlists owned by the user. |
-| `GET` | `/playlist/{playlist_id}`| Yes | Returns a playlist with its list of songs. |
-| `POST` | `/playlist/add-song` | Yes | Adds a song to a playlist. |
-| `DELETE`| `/playlist/remove-song`| Yes | Removes a song from a playlist. |
-| `DELETE`| `/playlist/{playlist_id}`| Yes | Deletes a playlist. |
+| Method   | Endpoint                  | Requires Token? | Description                                |
+| :------- | :------------------------ | :-------------: | :----------------------------------------- |
+| `POST`   | `/playlist/create`        |       Yes       | Creates a new playlist.                    |
+| `GET`    | `/playlist/list`          |       Yes       | Lists all playlists owned by the user.     |
+| `GET`    | `/playlist/{playlist_id}` |       Yes       | Returns a playlist with its list of songs. |
+| `POST`   | `/playlist/add-song`      |       Yes       | Adds a song to a playlist.                 |
+| `DELETE` | `/playlist/remove-song`   |       Yes       | Removes a song from a playlist.            |
+| `DELETE` | `/playlist/{playlist_id}` |       Yes       | Deletes a playlist.                        |
 
 ---
 
@@ -120,21 +120,23 @@ CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
 ### Installation
 
 1. Open your terminal in the server folder and set up a virtual environment:
+
    ```bash
    python -m venv venv
    ```
 
 2. Activate the virtual environment:
-   * Windows (PowerShell):
+   - Windows (PowerShell):
      ```powershell
      .\venv\Scripts\Activate.ps1
      ```
-   * Linux / macOS:
+   - Linux / macOS:
      ```bash
      source venv/bin/activate
      ```
 
 3. Install the dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -144,10 +146,12 @@ CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
    uvicorn app.main:app --reload
    ```
 
-The backend server will run at `http://127.0.0.1:8000`.
+The backend server runs locally at `http://127.0.0.1:8000`.
 
-### Testing & Docs
+### Live Hosted API & Docs
 
-You can view the interactive api docs at:
-* **Swagger UI Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-* **ReDoc Browser view**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+The backend is publicly hosted and running on Oracle Cloud. You can connect to the API or browse the documentation directly using these links:
+* **Live Swagger UI**: [http://152.67.191.54:8000/docs](http://152.67.191.54:8000/docs)
+* **Live ReDoc view**: [http://152.67.191.54:8000/redoc](http://152.67.191.54:8000/redoc)
+
+---

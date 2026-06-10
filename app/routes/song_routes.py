@@ -84,9 +84,7 @@ def search_songs(
     db: Session = Depends(get_session),
     auth_details: User = Depends(get_current_user),
 ):
-    """
-    Search for songs by matching title, artist, or tags case-insensitively.
-    """
+
     statement = select(Song).where(
         or_(
             Song.song_name.ilike(f"%{q}%"),
@@ -118,7 +116,9 @@ def favouriteSong(
 
         return {"message": False}
     else:
-        new_fav = Favourite(id=str(uuid.uuid4()), song_id=fav_song.song_id, user_id=user_id)
+        new_fav = Favourite(
+            id=str(uuid.uuid4()), song_id=fav_song.song_id, user_id=user_id
+        )
         db.add(new_fav)
         db.commit()
         return {"message": True}
