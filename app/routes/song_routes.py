@@ -11,6 +11,7 @@ from app.middleware.auth_middleware import get_current_user
 from app.models.favourite import Favourite
 from app.schemas.favourite import FavouriteSong
 from app.models.song import Song
+from app.models.user import User
 
 router = APIRouter(prefix="/song", tags=["Upload Song"])
 
@@ -30,7 +31,7 @@ def upload_song(
     song_name: str = Form(...),
     tags: str = Form(...),
     db: Session = Depends(get_session),
-    auth_user: dict = Depends(get_current_user),
+    auth_user: User = Depends(get_current_user),
 ):
     song_id = str(uuid.uuid4())
     song_upload_response = cloudinary.uploader.upload(
@@ -68,7 +69,7 @@ def upload_song(
 
 @router.get("/list", status_code=200)
 def fetchSongs(
-    db: Session = Depends(get_session), auth_details=Depends(get_current_user)
+    db: Session = Depends(get_session), auth_details: User = Depends(get_current_user)
 ):
     songs = db.exec(select(Song)).all()
     return songs
@@ -78,9 +79,9 @@ def fetchSongs(
 def favouriteSong(
     fav_song: FavouriteSong,
     db: Session = Depends(get_session),
-    auth_details=Depends(get_current_user),
+    auth_details: User = Depends(get_current_user),
 ):
-    user_id = auth_details["id"]
+    user_id = auth_details.id
 
     fav_song_res = db.exec(
         select(Favourite).where(
@@ -102,9 +103,9 @@ def favouriteSong(
 
 @router.get("/list-favourites", status_code=200)
 def fetchFavSongs(
-    db: Session = Depends(get_session), auth_details=Depends(get_current_user)
+    db: Session = Depends(get_session), auth_details: User = Depends(get_current_user)
 ):
-    user_id = auth_details["id"]
+    user_id = auth_details.id
     fav_songs = db.exec(
         select(Favourite)
         .where(Favourite.user_id == user_id)

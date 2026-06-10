@@ -1,28 +1,25 @@
-from fastapi import Header, HTTPException, Depends
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session, select
 from app.auth.jwt_handler import verify_token
 from app.db.database import get_session
 from app.models.user import User
 from uuid import UUID
 
+security = HTTPBearer(auto_error=False)
+
 
 def get_current_user(
-    authorization: str = Header(None),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_session),
-):
-    if authorization is None:
+) -> User:
+    if not credentials or credentials.scheme != "Bearer":
         raise HTTPException(
             status_code=401,
-            detail="Authorization header missing",
+            detail="Invalid authorization format or token missing",
         )
 
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization format",
-        )
-
-    token = authorization.split(" ")[1]
+    token = credentials.credentials
     payload = verify_token(token)
     
     sub = payload.get("sub")
@@ -32,22 +29,26 @@ def get_current_user(
     if not sub or not email:
         raise HTTPException(status_code=401, detail="Invalid token payload")
 
+    try:
+        user_uuid = UUID(sub)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid user ID format")
+
     # Ensure user exists in db and has correct UUID
-    user = db.exec(select(User).where(User.id == sub)).first()
+    user = db.exec(select(User).where(User.id == user_uuid)).first()
     if not user:
         user_by_email = db.exec(select(User).where(User.email == email)).first()
         if user_by_email:
-            user_by_email.id = UUID(sub)
+            user_by_email.id = user_uuid
             db.add(user_by_email)
             db.commit()
             db.refresh(user_by_email)
+            user = user_by_email
         else:
-            new_user = User(id=UUID(sub), name=name, email=email)
+            new_user = User(id=user_uuid, name=name, email=email)
             db.add(new_user)
             db.commit()
             db.refresh(new_user)
+            user = new_user
 
-    return {
-        "id": sub,
-        "email": email,
-    }
+    return user

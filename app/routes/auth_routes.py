@@ -42,11 +42,12 @@ def google_auth(authorization: str = Header(), session: Session = Depends(get_se
 
 @router.get("/")
 def current_user_data(
-    db: Session = Depends(get_session), user_dict=Depends(get_current_user)
+    db: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     user = db.exec(
         select(User)
-        .where(User.id == user_dict["id"])
+        .where(User.id == current_user.id)
         .options(joinedload(User.favourites))
     ).first()
 
