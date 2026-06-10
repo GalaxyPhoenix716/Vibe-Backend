@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlmodel import Session, select
 from sqlalchemy.orm import joinedload
@@ -12,6 +13,8 @@ from app.models.favourite import Favourite
 from app.schemas.favourite import FavouriteSong
 from app.models.song import Song
 from app.models.user import User
+from app.schemas.song import SongResponse, SongUploadResponse, FavouriteToggleResponse
+from app.schemas.user import FavouriteResponse
 
 router = APIRouter(prefix="/song", tags=["Upload Song"])
 
@@ -23,7 +26,7 @@ cloudinary.config(
 )
 
 
-@router.post("/upload", status_code=201)
+@router.post("/upload", status_code=201, response_model=SongUploadResponse)
 def upload_song(
     song_audio: UploadFile = File(...),
     thumbnail: UploadFile = File(...),
@@ -67,7 +70,7 @@ def upload_song(
     }
 
 
-@router.get("/list", status_code=200)
+@router.get("/list", status_code=200, response_model=List[SongResponse])
 def fetchSongs(
     db: Session = Depends(get_session), auth_details: User = Depends(get_current_user)
 ):
@@ -75,7 +78,7 @@ def fetchSongs(
     return songs
 
 
-@router.post("/favourite", status_code=201)
+@router.post("/favourite", status_code=201, response_model=FavouriteToggleResponse)
 def favouriteSong(
     fav_song: FavouriteSong,
     db: Session = Depends(get_session),
@@ -101,7 +104,7 @@ def favouriteSong(
         return {"message": True}
 
 
-@router.get("/list-favourites", status_code=200)
+@router.get("/list-favourites", status_code=200, response_model=List[FavouriteResponse])
 def fetchFavSongs(
     db: Session = Depends(get_session), auth_details: User = Depends(get_current_user)
 ):

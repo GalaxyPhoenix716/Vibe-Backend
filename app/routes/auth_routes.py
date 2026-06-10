@@ -5,11 +5,12 @@ from app.db.database import get_session
 from app.middleware.auth_middleware import get_current_user
 from app.models.user import User
 from app.auth.jwt_handler import verify_token
+from app.schemas.user import AuthLoginResponse, UserWithFavouritesResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/login")
+@router.post("/login", response_model=AuthLoginResponse)
 def google_auth(authorization: str = Header(), session: Session = Depends(get_session)):
 
     try:
@@ -40,7 +41,7 @@ def google_auth(authorization: str = Header(), session: Session = Depends(get_se
     }
 
 
-@router.get("/")
+@router.get("/", response_model=UserWithFavouritesResponse)
 def current_user_data(
     db: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
